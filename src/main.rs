@@ -120,8 +120,6 @@ impl State {
         }
     }
 
-    fn update(&mut self) {}
-
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
@@ -195,16 +193,12 @@ async fn run() {
             }
             _ => {}
         },
-        Event::RedrawRequested(window_id) if window_id == window.id() => {
-            state.update();
-
-            match state.render() {
-                Ok(_) => {}
-                Err(wgpu::SurfaceError::Lost) => state.resize(state.size),
-                Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-                Err(e) => eprintln!("{:?}", e),
-            }
-        }
+        Event::RedrawRequested(window_id) if window_id == window.id() => match state.render() {
+            Ok(_) => {}
+            Err(wgpu::SurfaceError::Lost) => state.resize(state.size),
+            Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
+            Err(e) => eprintln!("{:?}", e),
+        },
         Event::MainEventsCleared => {
             window.request_redraw();
         }
